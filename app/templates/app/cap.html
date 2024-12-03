@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Tut</title>
+   </head>
+   <body>
+      <form method="POST" novalidate>
+         {%csrf_token%}
+         <h1>Login</h1>
+         <h1>Login</h1>
+         <div class="social-container">
+             <a href="#" class="social"><i class="fa fa-facebook fa-2x"></i></a>
+             <a href="#" class="social"><i class="fab fa fa-twitter fa-2x"></i></a>
+         </div>
+         {% if msg %}
+           <h3 style="color:red">{{msg}}</style></h3>
+         {% endif %}  
+         <span>or use your account</span>
+         <input type="email" placeholder="Email" name="email" required/>
+         <input type="password" placeholder="Password" name="password" required/>
+         <a href="{% url 'forgot' %}">Forgot your password?</a>
+         {{ form.as_p }}
+         <div>
+           <button>Log In</button> or <b><a href="{% url 'sign' %}">click to sign up</a></b>
+         </div>
+         {{form.captcha}}
+         <input type="submit" value="submit">
+      </form>
+   </body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+   <html>
+     <head>
+       <title>Results</title>
+       <script>
+        function myFunction(){
+          var num=document.getElementById("quantity").value;
+          var item=document.getElementById("material").value;
+          var tot=num*item;
+          
+        }
+       </script>
+     </head>
+     <body>
+      <h1>Filtered Items</h1>
+
+      <table>
+        <thead>
+        <th>Item </th>
+        <th>Quantity</th>
+        <th>price</th>
+        <th>total</th>
+        </thead>
+          {% for item in items %}
+          <tr>
+            <td>{{item.material}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.rate}}</td>
+            <td>{{item.rate}}*{{item.quantity}}</td>
+          </tr>
+          {% endfor %}
+      </table>
+     </body>
+   </html>

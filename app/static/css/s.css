@@ -1,0 +1,139 @@
+body
+{  
+    margin: 0px; 
+}
+
+#container
+{
+  width: 100%;
+  margin: 0px auto;
+
+}
+.logo {
+  position: fixed;
+  top:30px;
+  color:#fff;
+  margin-top: 0;
+  margin-left: 80px;
+  user-select: none;
+  
+}
+
+
+.header
+{ 
+  position:absolute;
+  top: 0;
+  left:0;   
+  width: 100%;
+  font-size: small;
+  height: 50px; 
+  padding: 20px 100px; 
+  background: #747277; 
+  color:white;
+}
+
+
+.main  {
+    position: fixed;
+    top:100px;
+    left:0;
+    font-size: 1.3em;
+    border: 2px solid #8d8c8c;
+    width: 100%;
+    height:10%
+    user-select auto;   
+}
+.main a{
+  position: relative;
+  top: 10px;
+  margin-left: 30px;
+  text-decoration: none;
+  color:darkslategray;
+
+}
+.main1 a{
+  position: relative;
+  top:80px;
+  float: right;
+  margin-right: 30px;
+  color: darkslategray;
+  border: 1px solid #808080;
+  border-radius: 10px;
+  width: 150px;
+  text-align: center;
+}
+.main1 .button{
+  width:130px;
+  height: 50px;
+  border: 2px solid #808080;
+  outline: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #808080;
+  font-weight: 500;
+  margin-right: 30px;
+}
+
+.nav1 {
+  position: relative;
+  top: 100px;
+  left:0;
+  margin-left: 40px;
+ 
+  user-select: none;
+}
+.nav1 select{
+  margin-left: 20px;
+  width: 180px;
+  height: 25px;
+}
+.btn{
+  position: relative;
+  top:0px;
+  width: 11%;
+  height:25px ;
+  user-select: none;
+  margin-left: 10px;
+  border:2px solid #313232;
+  cursor:pointer;
+
+}
+
+img
+{ 
+    position: fixed;
+    top:0;
+    right: 0;
+    height: 100px;
+    user-select: none;
+}
+.button{
+  position:relative;
+  top: 180px;
+  float: right;
+  width: 150px;
+  height: 50px;
+  background: transparent;
+  border: 2px solid #808080;
+  outline: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #0f0f0f;
+  font-weight: 500;
+  margin-right: 50px;
+}
+
+.edit{
+  position: relative;
+  right: 0px;
+}
+.table{
+  position:fixed; 
+  overflow: scroll;
+  width: 100%;
+  height:50%
+  
+}

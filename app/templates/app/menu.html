@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/style1.css' %}">
+</head>
+<body>
+    <header>
+       
+        <nav class="navigation">
+       
+            <a href="#"><a href="{% url 'index' %}"><img src="/static/img/menu-close.webp"></a></a>     
+       </nav>                                                 
+        <h2 class="logo"><img src="/static/img/logo.png" width="250" height="130"></h2>   
+       
+    </header>
+</body>
+    <div class="nav">
+        <ul>
+        <li><a href="{% url 'loginn' %}"><h1 align="center">Login</h1></a></li>
+        <li><a href="{% url 'loginreport' %}"><h1 align="center">reports</h1</a></li>
+        <li><a href="{% url 'feedback' %}"><h1 align="center">Feedback</h1</a></li>
+        <li><a href="{% url 'about' %}"><h1 align="center">About us</h1</a></li>
+        </ul>
+    </div>
+    <div class="customerCareInfo">
+        <h4>Customer Care</h4>
+        <p><a href="tel:9876543210">+91 98765 43210</a></p>
+        <ul class="footerSocialIconList">
+            
+            <li>
+                <a href="https://www.facebook.com" target="_blank" class="socialIcon fbIcon"></a>
+            </li>
+            <li>
+                <a href="https://twitter.com" target="_blank" class="socialIcon twitterIcon"></a>
+            </li>
+            <li>
+                <a href="https://www.instagram.com" target="_blank" class="socialIcon instaIcon"></a>
+            </li>
+            <li>
+                <a href="https://www.youtube.com" target="_blank" class="socialIcon youtubeIcon"></a>
+            </li>
+            <li>
+                <a href="https://www.linkedin.com" target="_blank" class="socialIcon linkedinIcon"></a>
+            </li>
+            
+        </ul>
+    </div>
+   <div class="icon">
+    <img src="/static/img/menu-img.webp">
+ 
+   </div>
+</html>

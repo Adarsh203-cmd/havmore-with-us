@@ -1,0 +1,30 @@
+{% extends "app/base.html" %}
+{% block start %}
+    <div class="continer">
+        <form class="form" method="post" action="{% url 'fpassword' %}" id="form">
+            {% csrf_token %}
+            <h4>Forget Password</h4>
+    
+            {% if messages %}
+    
+            {% for message in messages %}
+            <div class="alert alert-info">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+    
+         
+            <div class="form-group">
+                <label for="email">email ID</label>
+                <input type="email" name="email"  class="form-control">
+               
+            </div>
+    
+            
+           
+            <button class="btn" type="submit">Submit</button>
+    
+        </form>
+    </div>
+{% endblock %}

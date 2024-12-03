@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="billTable" class="container mt-5">
+        <div>
+            <h3><b><center>RAM ENTERPRISES <br> GROUND FLOOR NO-3, 36/5Q, ARADHYA BUILDING, SB COLLEGE ROAD, UDUPI KARKALA <br> KARNATAKA-576117</center></b></h3>
+        </div>
+        <div>
+            <table class="table">
+                <tr>
+                    <td>
+                        <b>Order Number:</b>
+                        {{ order.id }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>Invoice Number:</b>
+                        {{ order.invoice_number }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>Invoice Date:</b>
+                        {{ order.date_ordered }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <h2>Seller</h2>
+        </div>
+            Name: <b>Ram Enterprises</b><br>
+            Address: <b>Ground floor, aradhya building, SB road, karkala</b><br>
+            Phone: <b>+91 8898490064</b>
+        <div>
+            <h2>Buyer</h2>
+        </div> 
+            Name:
+            <b>{{ order.user.cname }}</b><br>
+            Address:
+            <b>{{ order.user.address }}</b><br>
+            Phone:
+            <b>{{ order.user.cno }}</b>
+       <br><br>
+       <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th width="25%" align="center">Item Description</th>
+            <th width="20%" align="center">Quantity</th>
+            <th width="15%" align="center">Price</th>
+            <th width="15%" align="center">Amount</th>
+        </tr>
+        {% for order_item in order.orderitem_set.all %}
+        <tr>
+            <td align="center">{{ order_item.item.material }}</td>
+            <td align="center">{{ order_item.quantity }}</td>
+            <td align="center">{{ order_item.item.rate }}</td>
+            <td align="center">{{ order_item.amount }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" align="center"><b>Grand Total</b></td>
+            <td align="center">{{ order.total_amount }}</td>
+        </tr>
+    </table>
+    </div>
+    <button onclick="myfun('billTable')" class="btn btn-primary mt-3">Get Bill</button>
+    <script type="text/javascript">
+        function myfun(pa) {
+            var printContents = document.getElementById(pa).innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+    </body>
+    </html>

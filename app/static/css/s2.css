@@ -1,0 +1,36 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+header{
+    position:fixed;
+    top:0;
+    left:0;   
+    width: 100%;
+    height: 50px; 
+    padding: 20px 100px; 
+    background: #808080; 
+    color:white;
+  }
+  
+.main{
+    text-align: center;
+}
+
+.row{
+    position: fixed;
+    top:100px;
+    left:0;
+    margin-left: 20px;
+    
+   
+}
+  
+.row1{
+    position: fixed;
+    top:150px;
+    left:0;
+    margin-left: 20px;
+}

@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/s.css' %}">
+    #script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{% static '/js/dialog.js' %}"></script>
+    <style>
+    .textbox{
+      width: 100px;
+      height:100px;
+      position: absolute;
+      border:1px solid black;
+      right:2%;
+      top:46%;
+      height:250px;
+      width:350px;
+    }
+    .zero-stock {
+            background-color: red;
+        }
+    </style>
+
+    //js
+</head>
+<title>
+ 
+
+</title>
+<body>
+<div class="header" style="overflow: auto; height:5%;">
+    <img src="/static/img/logo.png" width="200" height="70">   
+<header>
+    <div class="main" style="height: 5%; top: 68px; width: 80%;">
+           <a href="{% url 'index' %}">Home</a>
+           <a href="{% url 'corders' %}">Orders</a></a>
+           <a href="{% url 'feedback' %}">feedback</a></a>
+           <a href="#"><select name="more" id="ss">
+            <option value="1"><a href="#">Accounts</a></option>
+            <option value="2"><a href="#">supply chain</a></option>
+           </select></a><br>
+           <a href="#"><form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form></a>
+    <div class="nav1">
+        <style>
+            nav1{
+                width: 5%;
+            }
+        </style>
+            <select>
+                <option value="all">RAM ENTERPRISES</option>
+                <option value="all">RAM </option>
+            </select>
+            <select>
+                <option value="all">All Divisions</option> 
+            </select>
+            <select>
+                <option value="all">All Material</option>
+            </select>
+            <button type="submit"class="btn">GO</button>
+           </div>
+    </div>
+</div>
+</header>
+<h2 class="logo">Welcome, {{request.session.name}}</h2>
+ <a href="{% url 'items' %}"><img id="o" src="/static/img/order.png" alt="order" style="top:140px; right:120px;" ></a> 
+ <div class="table">
+
+    <!--Table-->
+<form method="POST" action="{% url 'place_order' %}">
+{% csrf_token %}
+<table id="item_table">
+  <style>
+     body {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  .table {
+    position: absolute;
+    height: 300px; /* Set a specific height for the table container */
+    overflow-y: auto; /* Enable vertical scrolling */
+    top:45%;
+
+  }
+  td {
+    border: solid 2px rgb(212, 211, 222);
+    height: 30px;
+  }
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 40px;
+    background: #747277;
+    color: white;
+  }
+  table {
+    border-collapse: collapse;
+    width: 80%;
+    position: absolute;
+  }
+  th,
+  td {
+    border: 2px solid #747277;
+  }
+  tr:nth-child(even) {
+    background-color: #b0d4f9;
+  }
+</style>
+    <!--Table body-->
+    {% if key3 %}
+     <tbody>
+      <thead style="color: aliceblue; height: 10px;">
+        <tr>
+          <th>id</th>
+          <th>Item Name</th>
+          <th>Crate(5 pieces)</th>
+          <th>Qty</th>
+          <th>select</th>
+          <th>Rate(1 piece)</th>
+          <th>Stock</th>
+        </tr>
+      </thead>
+      {% for i in key3 %}
+      <tr style="text-align: center;">
+        <td>{{i.id}}</td>
+        <td>{{i.material}}</td>
+        <td>{{1}}</td>
+        <td><input type="number" name="quantity_{{i.id}}" min="0" max="{{ i.avail_stock }}" value="0" step="5" oninput="validateQty(this)"></td>
+        <td>
+          <input type="checkbox" name="item_checkbox_{{ i.id }}" value="{{ i.id }}">
+        </td>
+        <td>{{i.rate}}</td>
+        <td {% if i.avail_stock == 0 %}class="zero-stock"{% endif %}>
+          {{i.avail_stock}}
+      </tr>
+      {% endfor %}
+      <button>Place order</button>
+      <div class="ok">
+        <style>
+          .button {
+            border: none;
+            color: white;
+            background-color: #e7092a;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: px;
+            margin: 4px 2px;
+            cursor: pointer;
+            width: 15px;
+            height:10px;
+            right:10%;
+          }
+          </style>
+      </div>
+    </tbody>
+    {% endif %}
+<table>
+</form>
+<script>
+  function validateQty(input) {
+    var value = parseInt(input.value);
+    if (value % 5 !== 0) {
+      input.value = Math.floor(value / 5) * 5; // Round down to the nearest multiple of 5
+    }
+  }
+</script>
+</body>
+</html>

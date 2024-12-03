@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="{% static '/css/log.css' %}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title>Havmor</title>
+</head>
+<body>
+	<div class="container" id="container">
+		<div class="form-container log-in-container">
+			<form method="POST" action="{% url 'loginreport' %}">
+                {% csrf_token %}
+				<div class="click"><a href="{% url 'index' %}">home</a></div>
+				<h1>Login</h1>
+				<div class="social-container">
+                    <a href="https://www.facebook.com/profile.php?id=100092516217480&mibextid=ZbWKwL" class="social" style="vertical-align: middle;">
+                        <i class="fa fa-facebook fa-2x"></i>
+                    </a>
+                    <a href="https://instagram.com/ram_enterprise4?igshid=ZGUzMzM3NWJiOQ==" class="social" style="vertical-align: middle;">
+                        <img src="{% static '/img/igg.png' %}" alt="Instagram" width="35" height="35">
+                    </a>
+                </div>
+                <div>
+                    *Admin login*
+                </div>
+                
+                {% if msg %}
+                  <h3 style="color:red">{{msg}}</style></h3>
+                {% endif %}  
+				
+				<div class="in">
+					<input type="email" placeholder="Email" name="email" style="width: 80%"; required/>
+				    <input type="password" placeholder="Password" name="password" style="width: 80%"; required/>
+				</div>
+				<div>
+				  <button>Log In</button>
+			    </div>
+			</form>
+		</div>
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-right">
+                    <div class="imgg">
+                        <img id="o1" src="/static/img/logo.png" width="150" height="70" style="object-position: left;">
+                   </div>
+					<h1>Welcome!</h1>
+					<p><h3>Ram Enterprises <br>Havmore Icecream</h3></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

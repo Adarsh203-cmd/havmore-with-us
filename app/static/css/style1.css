@@ -1,0 +1,189 @@
+*{
+    margin: 0;
+    padding: 0;  
+    box-sizing: border-box;
+    font-family: 'poppins',sans-serif;
+}
+body{
+    position: fixed;
+    
+}
+
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 99;
+}
+.navigation a{
+    position: relative;
+    font-size: 1.1em;
+    color:#fff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 10px;
+}
+.logo{
+    position: fixed;
+    top:0;
+    right: 0;
+    font-size: 2em;
+    color:#fff;
+    user-select: none;
+}
+.nav{
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(115, 248, 186);
+    
+    
+}
+ul{
+    position: relative;
+    top:100px;
+    list-style: none;
+    
+}
+li{
+    font-size: 1.0em;
+    font-style: bold;
+    margin-top: 15px;
+}
+
+ul li a{
+    
+    text-decoration: none;
+    color: #fff;
+    padding: 5px 10px;
+    transition: 0.6s ease;
+   
+} 
+ul li a:hover{
+    color: #000;
+
+}
+
+.customerCareInfo {
+    
+    position:absolute;
+    left: 450px;
+    top:100px;
+    text-align: center;
+    margin-top: 350px;
+    
+}
+
+.customerCareInfo p {
+    font-size: 3rem;
+    font-family: "GothamRoundedBold";
+}
+
+ .customerCareInfo a {
+    color: #000;
+    text-decoration: none;
+}
+
+.customerCareInfo .footerSocialIconList {
+    margin-top: -100px;
+}
+
+.customerCareInfo .footerSocialIconList li {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.customerCareInfo .footerSocialIconList li .socialIcon {
+    position: relative;
+    height: 41px;
+    width: 41px;
+    
+    display: block;
+    background: url('social-icon-sprite.webp') 0px 0px;
+}
+
+.customerCareInfo .footerSocialIconList li .socialIcon.twitterIcon {
+    background-position: -50px 0px;
+}
+
+ .customerCareInfo .footerSocialIconList li .socialIcon.instaIcon {
+    background-position: -102px 0px;
+}
+
+ .customerCareInfo .footerSocialIconList li .socialIcon.youtubeIcon {
+    background-position: -153px 0px;
+}
+
+ .customerCareInfo .footerSocialIconList li .socialIcon.linkedinIcon {
+    background-position: -205px 0px;
+}
+.icon{
+    position: fixed;
+    bottom: 0;
+    left:0;  
+}
+.icon img{
+    position: relative;
+    bottom: -10px;
+    height: 550px;
+    width:300px;
+
+}
+*{
+    margin: 0;
+    padding: 0;  
+    box-sizing: border-box;
+    font-family: 'poppins',sans-serif;
+}
+body{
+    position:relative;
+    
+}
+
+header{
+    position:fixed;
+    left:0;
+    right:0;
+    width:100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 99;
+}
+.navigation a{
+    position: relative;
+    font-size: 1.1em;
+    color:#fff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 10px;
+}
+.logo{
+    position:absolute;
+    top:0;
+    right:0;
+    color:#fff;
+    user-select: none;
+    float: right;
+
+}
+.main-content {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .main-content img {
+    max-width: 100%;
+    height: 595
+    px;
+  }

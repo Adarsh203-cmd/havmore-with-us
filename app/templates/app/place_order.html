@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/payment.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Place Order</h1>
+<form action="{% url 'place_order' %}" method="POST">
+  {% csrf_token %}
+  <div class="box">
+    <div id="container">
+  <label for="id_customer_name">Customer Name:</label>
+  {{ form.customer_name }}
+
+  {% for item in items %}
+  <label for="id_quantity_{{ item.id }}">{{item.material }} - ${{item.rate }}</label>
+  {{ form['quantity_' + item.id|string] }}
+  {% endfor %}
+
+  <button type="submit">Place Order</button>
+</div>
+</div>
+</form>
+</body>
+</html>

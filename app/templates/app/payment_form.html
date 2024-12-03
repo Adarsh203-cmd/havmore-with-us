@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{% static '/css/payment.css' %}">
+  <title>Document</title>
+</head>
+<body>
+  <form method="POST" action="{% url 'payment' order.id %}" onsubmit="return validateForm()">
+    {% csrf_token %}
+    <div class="box">
+        <div id="container">
+            <h2>card details to pay  Rs.{{order.total_amount}}</h2>
+            
+            <label>
+            <span>Name On Card</span>
+            <input id="nameoncard" type="text" name="nameoncard" placeholder="Jane Smith" pattern="[A-Za-z\s]+" required>
+        </label>
+
+        <label>
+            <span>Card Number</span>
+            <input id="cardnumber" type="text" maxlength="19" name="cardnumber" placeholder="XXXX-XXXX-XXXX-XXXX" pattern="^[\d].{15}" required>
+        </label>
+
+        <label>
+            <span>Expiry Date</span>
+            <select id="month" name="month" required>
+                <option value="0" selected>January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+            </select>
+            
+            <select id="year" name="year">
+                <option value="0" selected>2023</option>
+                <option value="1">2024</option>
+                <option value="2">2025</option>
+                <option value="3">2026</option>
+                <option value="4">2027</option>
+                <option value="5">2028</option>
+                <option value="6">2029</option>
+                <option value="7">2030</option>
+                <option value="8">2031</option>
+            </select>
+        </label>
+
+        <label>
+            <span>CSV</span>
+            <input id="csv" type="text" name="csv" maxlength="3" placeholder="XXX" pattern="^[\d].{2}" required>
+        </label>
+        
+        <label>
+            <input class="button" type="submit" value="Submit">
+        </label>
+
+    </div>
+  </div>
+</form>
+
+<script>
+function validateForm() {
+  var selectedYear = parseInt(document.getElementById('year').value);
+  var selectedMonth = parseInt(document.getElementById('month').value); // 1-based index
+
+  var currentDate = new Date();
+  var currentYear = currentDate.getFullYear();
+  var currentMonth = currentDate.getMonth() + 1; // 1-based index
+
+  // If the selected year is less than the current year, the card is expired
+  if (selectedYear < currentYear) {
+    alert('Card already expired');
+    return false;
+  }
+
+  // If the selected year is the same as the current year, check the month
+  if (selectedYear === currentYear && selectedMonth < currentMonth) {
+    alert('Card already expired');
+    return false;
+  }
+
+  return true;
+}
+
+</script>
+</body>
+</html>

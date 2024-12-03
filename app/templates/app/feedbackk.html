@@ -1,0 +1,100 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/s.css' %}">
+  </head>
+<body>  
+  <body>
+    <div class="header" style="overflow: auto;">
+        <img src="/static/img/logo.png" width="200" height="70">   
+    <header>
+        <div class="main" style="height: 40px; top:120px;" >
+               <a href="{% url 'menu' %}">Home</a>
+               <a href="#">Reports</a>
+        <div class="nav1">
+          <a href="{% url 'show' %}"><img src="/static/img/back.png" alt="back" style="left:0%; top:30%; height: 8%; width: 4%;"></a>
+                <select>
+                    <option value="all">RAM ENTERPRISES</option>
+                    <option value="all">RAM </option>
+                </select>
+                <select>
+                    <option value="all">All Divisions</option> 
+                </select>
+                <select>
+                    <option value="all">All Material</option>
+                </select>
+                <button type="submit"class="btn">GO</button>
+               </div>
+        </div>
+    </div>
+    </header>
+    <h2 class="logo" style="height:10%;"><b>Your Feedbacks!</b> </h2>
+<h1>Orders</h1>
+<div class="table">
+  <!--Table-->
+<table>
+  <style>
+    body{
+      overflow-x: hidden;
+    }
+    td {
+        border: solid 2px rgb(212, 211, 222);
+        height: 30px;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      height: 40px;
+    }
+    .table {
+      position: fixed;
+      width: 80%;
+      height:320px;
+      top:45%;
+    }
+    table{
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      
+      border: 2px solid rgb(111, 111, 111);
+    }
+    th {
+      background: #e56370;
+    }
+    tr:nth-child(even) {
+  background-color: #babaaf;
+  }
+  .scrollable-field {
+        max-height: 80px;
+        overflow-y: auto;
+    }
+    </style>
+    <!--Table body-->
+
+     <tbody>
+      <thead style="color: aliceblue; height: 10px;">
+        <tr>
+          <th>Name</th>
+          <th>Email ID </th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Feedback</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feedback in feedbacks %}
+        <tr>
+            <td>{{ feedback.name }}</td>
+            <td>{{ feedback.email }}</td>
+            <td>{{ feedback.phone }}</td>
+            <td>{{ feedback.address }}</td>
+            <td>{{ feedback.feedback }}</td>
+        </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+{% block content %}
+  <h2>Payment Confirmation</h2>
+  <p>Your bank transfer payment for Order ID {{ order.id }} has been received and is being processed.</p>
+  <p>Please allow some time for the payment to be verified.</p>
+  <p>You will receive a confirmation email once the payment is successfully processed.</p>
+{% endblock %}
+
+</body>
+</html>l

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>helloooooo</title>
+</head>
+<title>
+  <style>
+    div.scroll {
+      background-color: #9c23a0;
+      width: 50%;
+      height: 300px;
+      overflow: auto;
+      text-align: justify;
+    }
+  </style>
+</title>
+<body>
+  {% for i in number %}
+    <h1>{{i}}</h1>
+  {% endfor %}
+  <h1>TF MF</h1>
+  <h1>TF MF</h1>
+  <h1>TF MF</h1>
+  <h1>TF MF</h1>
+  <h1>TF MF</h1>
+  <!--Table-->
+<div class="scroll">
+  fahwfiudhaifhsufhahfhsdhfshhhhhhhhhhhhhhhhhhhhhhd Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+  Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
+  when an unknown printer took a galley of type and scrambled it to make a type 
+  specimen book. It has survived not only five centuries, but also the leap 
+  into electronic typesetting, remaining essentially unchanged. It was popularised in 
+  the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+  and more recently with desktop publishing software like Aldus PageMaker including 
+  versions of Lorem Ipsum. It is a long established fact that a reader will be 
+  distracted by the readable content of a page when looking at its layout. 
+  The point of using Lorem Ipsum is that it has a more-or-less normal distribution 
+  of letters, as opposed to using 'Content here, content here', making it 
+  look like readable English. Many desktop publishing packages and web page editors 
+  now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' 
+  will uncover many web sites still in their infancy.
+</div>
+<table class="">
+  <!--Table head-->
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>Plant Name</th>
+      <th>Division</th>
+      <th>Material Name</th>
+      <th>expiry date</th>
+      <th>days left</th>
+      <th>CI stock</th>
+      <th>Available stock</th>
+      <th>CI stock price</th>
+      <th>Avail stock price</th>
+    </tr>
+  </thead>
+  <!--Table head-->
+
+  <!--Table body-->
+  {% if key1 %}
+  <tbody>
+    {% for i in key1 %}
+    <tr>
+      <td>{{i.id}}</td>
+      <td>{{i.plant_name}}</td>
+      <td>{{i.division}}</td>
+      <td>{{i.material}}</td>
+      <td>{{i.exp_date}}</td>
+      <td>{{i.available_days}}</td>
+      <td>{{i.ci_stock}}</td>
+      <td>{{i.avail_stock}}</td>
+      <td>{{i.ci_stock_price}}</td>
+      <td>{{i.avail_stock_price}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  {% endif%}
+  <!--Table body-->
+
+</table>
+  <!--Table-->
+  </div>
+</body>
+</html>

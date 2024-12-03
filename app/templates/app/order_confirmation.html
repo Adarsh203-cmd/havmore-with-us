@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Order Confirmation</h2>
+  
+    <p>Thank you for your order!</p>
+    s
+    <h3>Order Details</h3>
+    
+    <ul>
+      {% for item in items %}
+        <li>{{ item.product.name }} - ${{ item.price }}</li>
+      {% endfor %}
+    </ul>
+    
+    <p>Total amount paid: ${{ order_total }}</p>
+    
+    <h3>Shipping Address</h3>
+    
+    <p>{{ order.shipping_address }}</p>
+    
+    <h3>Billing Address</h3>
+    
+    <p>{{ order.billing_address }}</p>
+    
+    <p>Order date: {{ order.date }}</p>
+</body>
+</html>

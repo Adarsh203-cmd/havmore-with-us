@@ -1,0 +1,44 @@
+<!-- payment_confirm.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{% static '/css/payment.css' %}">
+  <title>Payment Confirmation</title>
+</head>
+<body>
+  <form method="POST" action="{% url 'payment_form' order.id %}">
+    {% csrf_token %}
+    <div class="box">
+        <div id="container">
+            <h2>Payment Confirmation</h2>
+            <label>
+                <span>Order ID:</span>
+                <input type="text" name="order_id" value="{{ order.id }}" readonly>
+            </label>
+            <label>
+                <span>Username:</span>
+                <input type="text" name="username" value="{{ order.user.cname }}" readonly>
+            </label>
+            <label>
+                <span>Customer Number:</span>
+                <input type="text" name="customer_number" value="{{ order.user.cno }}" >
+            </label>
+            <label>
+                <span>Email:</span>
+                <input type="text" name="email" value="{{ order.user.email }}" readonly >
+            </label>
+            <label>
+                <span>Address:</span>
+                <textarea name="address" >{{ order.user.address }}</textarea>
+            </label>
+            <button type="submit">Confirm Payment</button>
+        </div>
+    </div>
+  </form>
+</body>
+</html>

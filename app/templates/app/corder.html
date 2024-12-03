@@ -1,0 +1,180 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/s.css' %}">
+  </head>
+<body>  
+  <body>
+    <div class="header" style="overflow: auto;">
+        <img src="/static/img/logo.png" width="200" height="70">   
+    <header>
+        <div class="main" style="height: 40px; top:120px;" >
+               <a href="{% url 'menu' %}">Home</a>
+               <a href="#">Reports</a>
+        <div class="nav1">
+          <a href="{% url 'show' %}"><img src="/static/img/back.png" alt="back" style="left:0%; top:30%; height: 8%; width: 4%;"></a>
+                <select>
+                    <option value="all">RAM ENTERPRISES</option>
+                    <option value="all">RAM </option>
+                </select>
+                <select>
+                    <option value="all">All Divisions</option> 
+                </select>
+                <select>
+                    <option value="all">All Material</option>
+                </select>
+                <button type="submit"class="btn">GO</button>
+               </div>
+        </div>
+    </div>
+    </header>
+    <h2 class="logo" style="height:10%;"><b>Your Orders..</b> </h2>
+<h1>Orders</h1>
+<div class="table">
+  <!--Table-->
+<table>
+  <style>
+     body {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+    table{
+    border-collapse: collapse;
+
+    }
+    td {
+        border: solid 2px rgb(212, 211, 222);
+        height: 30px;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      height: 40px;
+      background: #e56370;
+      color: white;
+    }
+    .table {
+    position:fixed;
+    top: 280px; /* Adjust the bottom position as desired */
+    left:490px;
+    transform: translateX(-50%);
+    width: 80%;
+    height:300px;
+    }
+    th,
+    td {
+      
+      border: 2px solid rgb(111, 111, 111);
+    }
+    th {
+      background: #e56370;
+    }
+    tr:nth-child(even) {
+  background-color: #babaaf;
+  }
+  .scrollable-field {
+        max-height: 80px;
+        overflow-y: auto;
+    }
+    </style>
+    <!--Table body-->
+    {% if key5 %}
+     <tbody>
+      <thead style="color: aliceblue; height: 10px;">
+        <tr>
+          <th>Order ID</th>
+          <th>User Name</th>
+          <th>Item Name/Quantity</th>
+          <th>Total Amount</th>
+          <th>Date Ordered</th>
+          <th>Status</th>
+          <th>Pay status</th>
+          <th>Customer Details</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for order in key5 %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>{{ order.user.cname }}</td>
+      <td>
+        <div class="scrollable-field">
+          {% for order_item in order.orderitem_set.all %}
+          <p>{{ order_item.item.material }} (Quantity: {{ order_item.quantity }})</p>
+          {% endfor %}
+        </div>
+      </td>
+      <td>{{ order.total_amount }}</td>
+      <td>{{ order.date_ordered }}</td>
+      <td>
+        {% if order.status == 'delivered' %}
+          <span class="status-delivered">DELIVERED!</span>
+        {% else %}
+        <form method="post" action="{% url 'update_status' order.id %}">
+          {% csrf_token %}
+          <select name="status" {% if order.status == 'delivered' %}disabled{% endif %}>
+            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if order.status == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+        </select>
+        <button type="submit" {% if order.status == 'delivered' %}disabled{% endif %}>Update</button>
+        </form>
+        {% endif %}
+      </td>
+      <td> 
+        {% if order.pay_status %}
+        <span style="color: green;  font-weight: bold;">Payed!</span>
+        {% else %}
+        <span style="color: rgb(215, 6, 30);  font-weight: bold;">Pending..</span>
+        {% endif %}
+      </td>
+      <td> <!-- New column for customer details -->
+        <p>Address: {{ order.user.address }}</p>
+        <p>Phone: {{ order.user.cno }}</p>
+    </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+      <div class="ok">
+        <style>
+          .button {
+            border: none;
+            color: white;
+            background-color: #e7092a;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: px;
+            margin: 4px 2px;
+            cursor: pointer;
+            width: 15px;
+            height:10px;
+            right:10%;
+          }
+          </style>
+      </div>
+    </tbody>
+    {% endif %}
+  </table>
+</div>
+<script>
+  // Add JavaScript logic to color cells based on conditions
+  var today = new Date();
+  var tableCells = document.querySelectorAll('.table td');
+  tableCells.forEach(function(cell) {
+    var dateOrdered = new Date(cell.parentNode.cells[4].textContent);
+    var totalAmount = parseFloat(cell.parentNode.cells[3].textContent);
+    var availStock = parseInt(cell.parentNode.cells[2].querySelector('p').textContent.match(/\d+/)[0]);
+    
+    if (dateOrdered < today) {
+      cell.classList.add('expired-cell');
+    }
+    
+    if (availStock === 0) {
+      cell.classList.add('out-of-stock-cell');
+    }
+  });
+</script>
+</body>
+</html>

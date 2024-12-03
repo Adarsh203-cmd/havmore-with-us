@@ -1,0 +1,205 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/s.css' %}">
+    
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+<style>
+    .zero-stock {
+            background-color: red;
+            color:yellow;
+        }
+    .expired {
+             background-color: red;
+        }
+         
+</style>
+</head>
+<title>
+
+</title>
+<body>
+<div class="header" style="overflow: auto;">
+    <img src="/static/img/logo.png" width="200" height="70">   
+<header>
+    <div class="main" style="height: 40px; top:120px;" >
+           <a href="{% url 'menu' %}">Home</a>
+           <a href="{% url 'orders' %}">Orders</a></a>
+           <a href="{% url 'feedbackk' %}">feedbacks</a></a>
+           <a><select name="more" id="ss" onchange="location = this.value;">
+            <option value="#">Choose an option</option>
+            <option value="/supply-chain/">Supply Chain</option>
+            <option value="{% url 'report' %}">Reports</option>
+          </select></a>          
+    <div class="nav1">
+            <select>
+                <option value="all">RAM ENTERPRISES</option>
+                <option value="all">RAM </option>
+            </select>
+            <select>
+                <option value="all">All Divisions</option> 
+            </select>
+            <select>
+                <option value="all">All Material</option>
+            </select>
+            <button type="submit"class="btn">GO</button>
+            
+           </div>
+    </div>
+</div>
+</header>
+<h2 class="logo" style="height:10%;">Welcome, RAM ENTERPRISES
+  <form action="{% url 'index' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form></h2>
+<button class="button"><a href="{% url 'users' %}">Customer Status</a></button>
+<button class="button"><a href="{% url 'show' %}">Item Status</a> </button>
+<div class="table">
+    <!--Table-->
+<table>
+  <style>
+     body {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  table{
+    border-collapse: collapse;
+    width: 100%;
+  }
+    .table {
+      position: absolute;
+      height: 300px; /* Set a specific height for the table container */
+      overflow-y: auto; /* Enable vertical scrolling */
+       
+    }
+    td {
+      border: solid 2px rgb(212, 211, 222);
+      height: 30px;
+      
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      height: 40px;
+      background: #747277;
+      color: white;
+    }
+    .table {
+      position: fixed;
+      width: 80%;
+      height:320px;
+      top:45%;
+    }
+    th,
+    td {
+      border:2px solid #747277;
+    }
+    tr:nth-child(even) {
+      background-color: #b0d4f9;
+    }
+  </style>
+    <!--Table body-->
+    {% if key1 %}
+     <tbody>
+      <thead style="color: aliceblue; height: 10px;">
+        <tr>
+          <th>id</th>
+          <th>Division</th>
+          <th>Material Name</th>
+          <th>Price/(crate)</th>
+          <th>expiry date</th>
+          <th>days left</th>
+          <th>CI stock</th>
+          <th>Available stock</th>
+          <th>CI stock price</th>
+          <th>Avail stock price</th>
+          <th>Edit items</th>
+        </tr>
+      </thead>
+      {% for i in key1 %}
+      <tr>
+        <td>{{i.id}}</td>
+        <td>{{i.division}}</td>
+        <td>{{i.material}}</td>
+        <td>{{i.rate}}</td>
+        <td>{{ i.exp_date }}</td>
+       <td{% if i.is_expired %} class="expired"{% endif %}>
+        {% if i.is_expired %}
+       <span style="color: yellow;">Expired!</span>
+        {% else %}
+        {{ i.exp_date|timeuntil }}
+        {% endif %}
+       </td>
+        <td>{{i.ci_stock}}</td>
+        <td {% if i.avail_stock == 0 %}class="zero-stock"{% endif %}>
+          {{i.avail_stock}}</td>
+          <td id="ci_stock_price_{{ i.id }}">{{ i.ci_stock|multiply:i.rate }}</td>
+          <td id="ci_stock_price_{{ i.id }}">{{ i.avail_stock|multiply:i.rate }}</td>
+        <td>
+            <form name="editform" action="{% url 'edit' pk=i.id %}" method="POST">
+              {% csrf_token %}
+              <input type="submit" value="Edit">
+            </form>
+        </td>
+      </tr>
+      {% endfor %}
+      <div class="edit">
+        <form name="edit" action="{% url 'itemadd' %}" method="POST">
+          <style>
+            edit{
+              position:fixed;
+              right:0%;
+            }
+          </style>
+          {% csrf_token %}
+          <input type="submit" value="Add Items">
+          
+        </form>
+      </div>
+     </tbody>
+    {% elif key2 %}
+      <tbody>
+       <thead style="color: aliceblue;">
+        <tr>
+          <th>id</th>
+          <th>Customer Name</th>
+          <th>Customer Number</th>
+          <th>Email-ID</th>
+          <th>Address</th>
+          <th>register date</th>
+        </tr>
+      </thead>
+      {% for i in key2 %}
+        <tr>
+         <td>{{i.id}}</td>
+         <td>{{i.cname}}</td>
+         <td>{{i.cno}}</td>
+         <td>{{i.email}}</td>
+         <td>{{i.address}}</td>
+         <td>{{i.is_created}}</td>
+       </tr>
+      {% endfor %}
+      </tbody>
+   {% endif %}
+    <!--Table body-->
+  
+  </table>
+<!--Table-->
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
+  {% for msg in messages %}
+  <script>
+   alertify.set('notifier','position', 'bottom-right');
+   alertify.success('{{msg}}');
+  </script>
+  {% endfor %}
+
+</div>
+</body>
+</html>
