@@ -23,26 +23,20 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 import time
 from django.contrib.auth.hashers import make_password
-
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.tokens import default_token_generator 
 from .models import *
-from django.contrib import messages
-
-#from django.contrib.auth import authenticate, login
-#from django.contrib.auth import logout
-#from django.urls import reverse_lazy
-#from django.contrib.auth.views import PasswordResetView
-#from django.contrib.messages.views import SuccessMessageMixin
-
-#preset
-'''from django.shortcuts import render, redirect
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.models import User
+from django.shortcuts import redirect
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_text
-from django.conf import settings'''
+from django.contrib import messages
+from django.utils.encoding import force_str
+from django.utils.encoding import force_bytes
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
+from django.utils.timezone import now
 
 
 # Create your views here.
@@ -55,23 +49,12 @@ def loginrview(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        if email == 'havmor@gmail.com' and password == 'havmor@123':
+        if email == 'ramenterprise9a@gmail.com' and password == 'havmor@123':
             return render(request, 'app/reports.html')
         
     return render(request, 'app/login1.html')
 
 def menuview(request):
-    '''send_mail(
-        # title:
-        "Testing mail",
-        # message:
-        'email_plaintext_message',
-        # from:
-        "adarshpacharya268@gmail.com",
-        # to:
-        ['adarshpacharya90@gmail.com'],
-        fail_silently=False,
-    )'''
     return render(request,"app/menu.html")
 
 def indexview(request):
@@ -196,34 +179,38 @@ def usershow(request):
     return render(request,"app/controls.html",{'key2':user_data})
 
 
-#login
+# Login Function
 def userlogin(request):
-       if request.POST['email']=='havmor@gmail.com':
-        if request.POST['password']=='havmor@123':
-           return render(request,"app/controls.html")
-        else:
-           message="password doesn't match!"
-           return render(request,"app/login.html",{'msg':message})
-           
-       if request.method=='POST':
-        email=request.POST['email']
-        password=request.POST['password']
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        try:
+            user = usertable.objects.get(email=email)
+            
+            if check_password(password, user.password):  # Validate password
+                user.last_login = now()
+                user.save()
+                
+                # Store user details in session
+                request.session['user_id'] = user.id  # Use user ID for uniqueness
+                request.session['name'] = user.cname
+                request.session['email'] = user.email  # Optional
 
-        user=usertable.objects.filter(email=email).first()
-        if user:
-             if user.password==password:
-                request.session['name']=user.cname
-                request.session['number']=user.cno
-                request.session['email']=user.email
-                request.session['address']=user.address
-                return render(request, "app/user1.html")
-             else:
-                message="password does not match!"
-                return render(request,"app/login.html",{'msg':message})
-        else:
-             message="user does not exist"
-             return render(request,"app/login.html",{'msg':message})
+                if user.is_superuser:  # Admin check
+                    return redirect('controls')  # Redirect to admin page
+                else:
+                    return redirect('items')  # Redirect to user dashboard
+            else:
+                return render(request, 'login.html', {'error': 'Invalid password.'})
+        
+        except usertable.DoesNotExist:
+            return render(request, 'login.html', {'error': 'User does not exist.'})
+    
+    return render(request, 'login.html')
 
+def logout(request):
+    return render(request, "app/login1.html")
 #singupview
 def signup(request):
     return render(request,"app/signup.html")
@@ -235,90 +222,154 @@ def forgotview(request):
 def newpassword(request):
     return render(request,"app/newpassword.html")
 
-#registeruser
-def registeruser(request):
-    if request.method=='POST':
-        name=request.POST['name']
-        pno=request.POST['number']
-        email=request.POST['email']
-        add=request.POST['address']
-        password=request.POST['password']
-        cpassword=request.POST['cpassword']
+# Email OTP Verification
+from django.shortcuts import redirect
 
-        user=usertable.objects.filter(email=email)
-         
+# Email OTP Verification
+def verify_email_otp(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        otp = request.POST['otp']
+
+        # Check if the email and OTP match
+        user = usertable.objects.filter(email=email, otp=otp).first()
+
         if user:
-            message="this emailID was already registered! Re-Enter"
-            return render(request,"app/signup.html",{'msg':message})
-        else:
-            if password==cpassword:
-                usertable.objects.create(cname=name,cno=pno,email=email,address=add,password=password)
+            # Clear the OTP and mark the user as verified
+            user.otp = None
+            user.is_verified = True
+            user.save()
 
-                return render(request,"app/login.html")
-           #else:
-               # message="password does not match!"
-                #return render(request,"app/signup.html",{'msg':message})
+            # Display a success message and redirect to login
+            messages.success(request, "Your account has been verified! You can now log in.")
+            return redirect('login')  # Redirect to the login page route
+        else:
+            # Display an error message if OTP is invalid
+            message = "Invalid OTP! Please try again."
+            return render(request, 'app/verify_otp.html', {'email': email, 'msg': message})
+
+    return render(request, 'app/verify_otp.html')
+
+
+
+# Register user function
+def registeruser(request):
+    if request.method == 'POST':
+        # Retrieve user details from the form
+        name = request.POST['name']
+        pno = request.POST['number']
+        email = request.POST['email']
+        add = request.POST['address']
+        password = request.POST['password']
+        cpassword = request.POST['cpassword']
+
+        # Validate if passwords match
+        if password != cpassword:
+            message = "Passwords do not match! Please try again."
+            return render(request, "app/signup.html", {'msg': message})
+
+        # Check if the email is already registered
+        if usertable.objects.filter(email=email).exists():
+            message = "This email ID is already registered! Please re-enter."
+            return render(request, "app/signup.html", {'msg': message})
+
+        # Create a new user instance
+        user = usertable(
+            cname=name,
+            cno=pno,
+            email=email,
+            address=add,
+            is_verified=False  # Mark as not verified initially
+        )
+        user.set_password(password)  # Hash the password before saving
+        user.save()
+
+        # Generate a 6-digit OTP for verification
+        otp = ''.join(random.choices('0123456789', k=6))
+
+        # Save the OTP to the user object
+        user.otp = otp
+        user.save()
+
+        # Send the OTP to the user's email
+        subject = 'Verify Your Account - OTP'
+        message = f'Hi {user.cname},\n\nYour OTP for account verification is: {otp}'
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+        except Exception as e:
+            # Handle email sending failure
+            user.delete()  # Remove the user record since email failed
+            message = f"Failed to send OTP. Please try again later. Error: {str(e)}"
+            return render(request, "app/signup.html", {'msg': message})
+
+        # Redirect to OTP verification page
+        return render(request, "app/verify_otp_email.html", {'email': email})
+    
+    # Render the sign-up page for GET requests
+    return render(request, "app/signup.html")
 
 def showp(request):
     return render(request,"app/show.html")
 
-#order
-
+# Place Order
 def place_order(request):
     if request.method == 'POST':
         items = Items.objects.all()
         checked_items = []
-        user_name = request.session.get('name')
+        user_id = request.session.get('user_id')  # Fetch user ID from session
         
-      
+        if not user_id:
+            return redirect('login')  # Redirect to login if user is not logged in
+        
         for item in items:
             item_id = str(item.id)
-            checkbox_name = 'item_checkbox_' + item_id
-            quantity_name = 'quantity_' + item_id
+            checkbox_name = f'item_checkbox_{item_id}'
+            quantity_name = f'quantity_{item_id}'
 
             if checkbox_name in request.POST:
-                quantity = request.POST.get(quantity_name, '0')
-                quantity = int(quantity)
+                quantity = int(request.POST.get(quantity_name, '0'))
                 if quantity > 0:
                     checked_items.append((item, quantity))
 
         if not checked_items:
             message = "Please use the checkbox to select Items."
             return render(request, 'app/user1.html', {'message': message})
-        else:
-            message="order places successsfully!"
+        
+        # Retrieve the logged-in user
+        user = get_object_or_404(usertable, id=user_id)
+        order = Order.objects.create(user=user, total_amount=0)
+        total_amount = 0
 
-        user = get_object_or_404(usertable, cname=user_name)
-        order = Order.objects.create(user=user,total_amount=0)
-        order.save()  
-        total_amount = 0  # Initial total amount
-
+        # Process selected items
         for item, quantity in checked_items:
-            order_item = OrderItem.objects.create(order=order, item=item, quantity=quantity)
+            OrderItem.objects.create(order=order, item=item, quantity=quantity)
             total_amount += item.rate * quantity
-            item.avail_stock=F('avail_stock')-quantity
-            item.ci_stock=F('ci_stock')-quantity
+            item.avail_stock = F('avail_stock') - quantity
+            item.ci_stock = F('ci_stock') - quantity
             item.save()
-    
-        order.total_amount = total_amount  # Update the total amount
+        
+        # Update order total
+        order.total_amount = total_amount
         order.save()
 
         context = {
             'order': order,
             'order_items': checked_items,
             'total_amount': total_amount,
-            
         }
         
-        return render(request, 'app/success.html',context)
+        return render(request, 'app/success.html', context)
     
     items = Items.objects.all()
     return render(request, 'app/user1.html', {'items': items})
     
-#orders detail
+# Admin Order Details
 def orders(request):
-    orders = Order.objects.order_by('-date_ordered')
-    return render(request, "app/corder.html",{'key5':orders})
+    orders = Order.objects.order_by('-date_ordered').select_related('user')
+    return render(request, "app/corder.html", {'key5': orders})
     
 
 #status update
@@ -333,12 +384,17 @@ def update_status(request, order_id):
 
     return redirect('orders')
 
-#user order
+# User's Orders
 def display_orders(request):
-    user_name = request.session.get('name')
-    user = usertable.objects.get(cname=user_name)
-    orders = Order.objects.filter(user=user)
-    return render(request, 'app/orders.html', {'orders': orders,'user': user})
+    user_id = request.session.get('user_id')  # Use user ID to fetch orders
+    
+    if not user_id:
+        return redirect('login')  # Redirect to login if user is not logged in
+    
+    user = get_object_or_404(usertable, id=user_id)
+    orders = Order.objects.filter(user=user).order_by('-date_ordered')
+    
+    return render(request, 'app/orders.html', {'orders': orders, 'user': user})
 
 #payment form
 def payment_form(request, order_id):
@@ -356,28 +412,44 @@ def generate_invoice_number():
     return f"{prefix}-{random_number}"
 
 
-# Helper function to check if card is expired
+from datetime import datetime
+
+# Helper function to check if the card is expired
 def is_card_expired(expiry_month, expiry_year):
     current_year = datetime.now().year
     current_month = datetime.now().month
 
-    # If the card's expiry year is before the current year, it's expired
-    if int(expiry_year) < current_year:
+    # Convert inputs to integers (in case they're passed as strings)
+    expiry_month = int(expiry_month)
+    expiry_year = int(expiry_year)
+
+    # If the expiry year is in the past
+    if expiry_year < current_year:
         return True
-    # If the card's expiry year is the same as the current year, check the month
-    if int(expiry_year) == current_year and int(expiry_month) < current_month:
+    # If the expiry year is the current year but the month is in the past
+    if expiry_year == current_year and expiry_month < current_month:
         return True
+
+    # The card is not expired
     return False
+
     
 #payment
 def payment(request, order_id):
     print("Payment function called")
     if request.method == 'POST':
-        name_on_card = request.POST['nameoncard']
-        card_number = request.POST['cardnumber']
-        expiry_month = request.POST['month']
-        expiry_year = request.POST['year']
-        csv = request.POST['csv']
+        name_on_card = request.POST.get('nameoncard')
+        card_number = request.POST.get('cardnumber')
+        expiry_month = request.POST.get('month')
+        expiry_year = request.POST.get('year')
+        csv = request.POST.get('csv')
+
+        # Check if the card is expired
+        if is_card_expired(expiry_month, expiry_year):
+            return render(request, 'payment_form.html', {
+                'order_id': order_id,
+                'error': 'Card is expired. Please use a valid card.'
+            })
 
         order = get_object_or_404(Order, id=order_id)
 
@@ -550,165 +622,6 @@ def report(request):
         'selected_month': selected_month,
     })
 
-
-
-#preset
-'''def generate_otp(length=6):
-    # Generate a random OTP
-    digits = string.digits
-    otp = ''.join(random.choice(digits) for _ in range(length))
-    return otp
-
-
-def send_otp_via_email(sender_email, sender_password, recipient_email, otp):
-    # SMTP server configuration (for Gmail)
-    smtp_server = 'smtp.gmail.com'
-    smtp_port = 587
-
-    # Email content
-    subject = 'One-Time Password (OTP)'
-    body = f'Your OTP is: {otp}'
-    message = f'Subject: {subject}\n\n{body}'
-
-    try:
-        # Connect to the SMTP server
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(sender_email, sender_password)
-
-        # Send the email to the recipient
-        server.sendmail(sender_email, recipient_email, message)
-        print(f'OTP sent to {recipient_email} successfully!')
-        return True
-
-    except Exception as e:
-        print(f'Error sending the OTP: {e}')
-        return False
-
-
-def send_otp(request):
-    if request.method == 'POST':
-        # Set the sender's email and password
-        sender_email = 'ramenterprise9a@gmail.com'
-        sender_password = 'auywmyyqlgsvggwr'
-
-        # Get the recipient's email from the form input
-        recipient_email = request.POST.get('recipient_email')
-
-        # Generate the OTP
-        otp = generate_otp()
-
-        # Send the OTP via email
-        if send_otp_via_email(sender_email, sender_password, recipient_email, otp):
-            request.session['otp'] = otp  # Store the OTP in the session for verification
-            return redirect('verify_otp')  # Redirect to the verify_otp view
-        else:
-            return HttpResponse('Failed to send OTP.')
-
-    # Render the template with the form
-    return render(request, 'app/send_otp.html')
-
-#verifu otp
-def verify_otp(request):
-    if request.method == 'POST':
-        form = OTPVerificationForm(request.POST)
-        if form.is_valid():
-            otp = form.cleaned_data['otp']
-            stored_otp = request.session.get('otp')  # Retrieve the stored OTP from the session
-            if otp == stored_otp:
-                del request.session['otp']  # Delete the OTP from the session after successful verification
-                messages.success(request, 'OTP verified successfully.')
-                return redirect('change_password')  # Replace 'change-password' with the desired redirect page
-            else:
-                messages.error(request, 'Invalid OTP. Please try again.')
-    else:
-        form = OTPVerificationForm()
-
-    return render(request, 'app/verify_otp.html', {'form': form})
-
-#change password
-from .custom_filters import custom_hash_function
-from django.core.exceptions import ValidationError
-
-def change_password(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        otp = request.POST.get('otp')
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
-
-        if new_password != confirm_password:
-            messages.error(request, 'Passwords do not match.')
-            return redirect('/change-password/')
-
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, 'Invalid email.')
-            return redirect('/change-password/')
-
-        user = usertable.objects.filter(email=email).first()
-        if user:
-            if user.otp == otp:
-                hashed_password = custom_hash_function(new_password)
-                user.password = hashed_password
-                user.save()
-                messages.success(request, 'Password successfully changed. Please log in with your new password.')
-                return redirect('/login/')
-            else:
-                messages.error(request, 'Invalid OTP.')
-                return redirect('/change-password/')
-        else:
-            messages.error(request, 'Invalid email.')
-            return redirect('/change-password/')
-
-    return render(request, 'app/change_password.html')'''
-
-
-
-'''def password_reset(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        user = usertable.objects.filter(email=email).first()
-        if user:
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk)).decode('utf-8')
-            reset_url = request.build_absolute_uri(
-                f'/password-reset-confirm/{uid}/{token}/'
-            )
-            email_subject = 'Password Reset Request'
-            email_body = render_to_string('password_reset_email.html', {
-                'user': user,
-                'reset_url': reset_url,
-                'site_name': get_current_site(request).name,
-            })
-            send_mail(email_subject, email_body, settings.DEFAULT_FROM_EMAIL, [email])
-        return redirect('password_reset_done')
-    return render(request, 'password_reset_form.html')
-
-def password_reset_done(request):
-    return render(request, 'password_reset_done.html')
-
-def password_reset_confirm(request, uidb64, token):
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    
-    if user and default_token_generator.check_token(user, token):
-        if request.method == 'POST':
-            new_password = request.POST.get('new_password')
-            user.set_password(new_password)
-            user.save()
-            return redirect('password_reset_complete')
-    
-    return render(request, 'password_reset_confirm_form.html')
-
-def password_reset_complete(request):
-    return render(request, 'password_reset_complete.html')'''
-
-
 # otp
 import random
 from django.core.mail import send_mail
@@ -774,7 +687,7 @@ def update_password(request):
 
             if user:
                 # Update the user's password
-                user.password = new_password
+                user.set_password(new_password)  # Hash the password before saving
                 user.save()
 
                 return render(request, 'app/login.html')

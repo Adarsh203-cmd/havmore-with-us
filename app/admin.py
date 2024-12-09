@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import usertable
 
-# Register your models here.
+@admin.register(usertable)
+class UserTableAdmin(admin.ModelAdmin):
+    list_display = ('email', 'cname', 'is_active', 'is_verified')
+    search_fields = ('email', 'cname')

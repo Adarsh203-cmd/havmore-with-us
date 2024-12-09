@@ -1,54 +1,83 @@
 from operator import itemgetter
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.dispatch import receiver
 from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
-from django.core.mail import send_mail  
-from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail 
+from django.utils import timezone 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils import timezone
 
-# Create your models here.
-class usertable(models.Model):
-    cname=models.CharField(max_length=50)
-    cno=models.CharField(max_length=50)
-    email=models.EmailField(max_length=50)
-    address=models.CharField(max_length=50)
-    password=models.CharField(max_length=50)
-    otp = models.CharField(max_length=6, default="")
-    is_active=models.BooleanField(default=False)
-    is_created=models.DateTimeField(auto_now_add=True, null=True, blank=True)
+# Custom user manager
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, cname, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, cname=cname, **extra_fields)
+        user.set_password(password)  # Hash password before saving
+        user.save(using=self._db)
+        return user
 
-#ItemStock
+    def create_superuser(self, email, cname, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, cname, password, **extra_fields)
+
+# Custom user model
+class usertable(AbstractBaseUser, PermissionsMixin):  # Added PermissionsMixin for compatibility
+    id = models.AutoField(primary_key=True)
+    cname = models.CharField(max_length=50)
+    cno = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(max_length=50, unique=True)
+    address = models.CharField(max_length=50)
+    password = models.CharField(max_length=128)
+    otp = models.CharField(max_length=6, null=True, blank=True)
+    is_active = models.BooleanField(default=True)  # Required for Django's authentication
+    is_verified = models.BooleanField(default=False)
+    is_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    last_login = models.DateTimeField(default=timezone.now)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['cname']  # Required fields for creating a user
+
+    def __str__(self):
+        return self.email
+
+
+# ItemStock model for inventory management
 class Items(models.Model):
-    plant_name=models.CharField(max_length=50)
-    division=models.CharField(max_length=50)
-    material=models.CharField(max_length=50)
-    exp_date=models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    available_days=models.IntegerField(blank=True, null=True)
-    rate=models.IntegerField(default=1)
-    ci_stock=models.IntegerField()
-    avail_stock=models.PositiveIntegerField()
-    ci_stock_price=models.IntegerField()
-    avail_stock_price=models.IntegerField()
+    plant_name = models.CharField(max_length=50)
+    division = models.CharField(max_length=50)
+    material = models.CharField(max_length=50)
+    exp_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    available_days = models.IntegerField(blank=True, null=True)
+    rate = models.IntegerField(default=1)
+    ci_stock = models.IntegerField()
+    avail_stock = models.PositiveIntegerField()
+    ci_stock_price = models.IntegerField()
+    avail_stock_price = models.IntegerField()
 
-#cartitem
-
+# Order model for handling customer orders
 class Order(models.Model):
     user = models.ForeignKey(usertable, on_delete=models.CASCADE, related_name='orders')
-    total_amount = models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     date_ordered = models.DateTimeField(auto_now_add=True)
-    items=models.ManyToManyField(Items,through='OrderItem')
-    status=models.CharField(max_length=10,blank=True,null=True)
+    items = models.ManyToManyField(Items, through='OrderItem')
+    status = models.CharField(max_length=10, blank=True, null=True)
     pay_status = models.BooleanField(default=False)
     invoice_number = models.CharField(max_length=255, blank=True, null=True)
 
-
+# OrderItem model to link items to orders
 class OrderItem(models.Model):
-    order=models.ForeignKey(Order,on_delete=models.CASCADE)
-    item=models.ForeignKey(Items,on_delete=models.CASCADE)
-    quantity=models.IntegerField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
 
-#payment
+# CardPayment model for handling payments through card
 class CardPayment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=16)
@@ -59,8 +88,8 @@ class CardPayment(models.Model):
 
     def __str__(self):
         return f"Card Payment for Order {self.order.id}"
-    
-#feedback
+
+# Feedback model for collecting customer feedback
 class Feedback(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -70,27 +99,10 @@ class Feedback(models.Model):
 
     def __str__(self):
         return self.name
-    
-    
-'''class Invoice(models.Model):
-    invoice_number = models.CharField(max_length=255)
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    items = models.TextField()
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)'''
-#preset
-'''class profile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
-    forget_password_token=models.CharField(max_length=100)
-    created_at=models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.user.email'''
-
-#p_reset
-'''@receiver(reset_password_token_created)
+# Password reset signal handler
+@receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
-
     email_plaintext_message = "{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key)
 
     send_mail(
@@ -99,7 +111,8 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         # message:
         email_plaintext_message,
         # from:
-        "adarshpacharya268@gmail.com",
+        "adarshpacharya268@gmail.com",  # Replace with a valid email
         # to:
         [reset_password_token.user.email]
-    )'''
+    )
+

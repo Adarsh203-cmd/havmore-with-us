@@ -113,6 +113,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+LOGIN_URL = '/login/'  # Assuming 'path("login/", views.userlogin, name="login")' is in urls.py
+LOGIN_REDIRECT_URL = '/controls/'
+AUTH_USER_MODEL = 'app.usertable'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Ends session when the browser closes
+SESSION_COOKIE_AGE = 1800  # Expires session after 30 minutes (in seconds)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -162,6 +173,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER='ramenterprise9a@gmail.com'
 EMAIL_HOST_PASSWORD='auywmyyqlgsvggwr'
 ACCOUNT_PASSWORD_MIN_LENGTH=8
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-31()*hf9relgtssbt9z+0i!!rlm!jvf!&2)!5*7uf5imu#gp&2'

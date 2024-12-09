@@ -27,7 +27,7 @@
 <div class="header" style="overflow: auto;">
     <img src="/static/img/logo.png" width="200" height="70">   
 <header>
-    <div class="main" style="height: 40px; top:120px;" >
+    <div class="main" style="height: 40px; top:92px;" >
            <a href="{% url 'menu' %}">Home</a>
            <a href="{% url 'orders' %}">Orders</a></a>
            <a href="{% url 'feedbackk' %}">feedbacks</a></a>
@@ -35,7 +35,7 @@
             <option value="#">Choose an option</option>
             <option value="/supply-chain/">Supply Chain</option>
             <option value="{% url 'report' %}">Reports</option>
-          </select></a>          
+          </select></a>   
     <div class="nav1">
             <select>
                 <option value="all">RAM ENTERPRISES</option>
@@ -50,16 +50,21 @@
             <button type="submit"class="btn">GO</button>
             
            </div>
+           <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form>   
     </div>
 </div>
 </header>
 <h2 class="logo" style="height:10%;">Welcome, RAM ENTERPRISES
-  <form action="{% url 'index' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Logout</button>
-  </form></h2>
-<button class="button"><a href="{% url 'users' %}">Customer Status</a></button>
-<button class="button"><a href="{% url 'show' %}">Item Status</a> </button>
+</h2>
+<button class="button" style="background-color: red; color: white;">
+    <a href="{% url 'users' %}" style="color: rgb(251, 248, 248); text-decoration: none;">Customer Status</a>
+</button>
+<button class="button" style="background-color: red; color: white;">
+    <a href="{% url 'show' %}" style="color: white; text-decoration: none;">Item Status</a>
+</button>
 <div class="table">
     <!--Table-->
 <table>
